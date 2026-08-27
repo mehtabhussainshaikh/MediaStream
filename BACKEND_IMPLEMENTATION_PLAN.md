@@ -409,9 +409,16 @@ The media-upload phase uses these locked decisions:
 - Metadata limits: title 2-120 characters, description at most 2000 characters, at most 10 tags, and each tag at most 30 characters.
 - Cloudinary resource types: images and PDFs use `image`; video and audio use `video`.
 
-The following phase-specific decisions remain to be locked before their related implementation begins:
+The media-search phase uses these locked decisions:
 
-- Allowed search `sort` values and default behavior when `q` is absent.
+- `sort` values are `relevance`, `newest`, `oldest`, and `mostViewed`.
+- A request with `q` must use relevance; a request without `q` defaults to newest and cannot request relevance.
+- `tags` is a comma-separated list normalized to unique lowercase values and matched with MongoDB `$all`.
+- `from` and `to` use inclusive UTC calendar-day bounds in strict `YYYY-MM-DD` format.
+- Relevance ties use `viewCount` descending, `createdAt` descending, then `_id` ascending; non-text sorts also use `_id` ascending as their final stable tie-breaker.
+
+The following phase-specific decision remains to be locked before its related implementation begins:
+
 - Deployment target from the examples permitted by the assessment.
 
 None of these decisions authorizes adding unrelated infrastructure.
