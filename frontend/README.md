@@ -46,6 +46,6 @@ npm run preview
 
 ## Deployment
 
-Build with `npm run build` and deploy `dist/` to Vercel or another static host with SPA fallback enabled. Set `VITE_API_BASE_URL` at build time. The backend must allow the exact deployed frontend origin and use a compatible secure `SameSite` cookie policy.
+The included `vercel.json` configures Vite output and SPA route fallback. Import the repository in Vercel, set the root directory to `frontend`, and define both `VITE_API_BASE_URL` and `VITE_REALTIME_URL` as the public Render backend origin. The backend must set `FRONTEND_ORIGIN` to the exact Vercel production origin and use a compatible secure `SameSite` cookie policy.
 
 No live URL is included because hosting credentials and live MongoDB/Cloudinary configuration are not present in this workspace.
