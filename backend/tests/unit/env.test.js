@@ -5,6 +5,7 @@ const validEnvironment = {
   PORT: '3001',
   MONGODB_URI: 'mongodb://localhost:27017/mediastream-test',
   FRONTEND_ORIGIN: 'http://localhost:5173',
+  JWT_ACCESS_SECRET: 'test-secret-that-is-at-least-32-characters',
 };
 
 describe('loadConfig', () => {
@@ -18,7 +19,7 @@ describe('loadConfig', () => {
     });
   });
 
-  test.each(['MONGODB_URI', 'FRONTEND_ORIGIN'])('rejects missing %s', (key) => {
+  test.each(['MONGODB_URI', 'FRONTEND_ORIGIN', 'JWT_ACCESS_SECRET'])('rejects missing %s', (key) => {
     const environment = { ...validEnvironment };
     delete environment[key];
     expect(() => loadConfig(environment)).toThrow(`Missing required environment variable: ${key}`);
@@ -32,4 +33,3 @@ describe('loadConfig', () => {
     })).toThrow('FRONTEND_ORIGIN must contain only an HTTP(S) origin');
   });
 });
-

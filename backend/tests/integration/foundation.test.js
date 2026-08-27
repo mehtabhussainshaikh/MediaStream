@@ -7,6 +7,11 @@ const config = {
   isProduction: false,
   frontendOrigin: 'http://localhost:5173',
   jsonBodyLimit: '10kb',
+  jwtAccessSecret: 'test-secret-that-is-at-least-32-characters',
+  accessTokenTtl: '15m',
+  refreshSessionTtlDays: 7,
+  refreshCookieName: 'mediastream_refresh',
+  cookieSameSite: 'lax',
 };
 const logger = { info: jest.fn(), error: jest.fn() };
 
