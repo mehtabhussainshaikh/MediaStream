@@ -58,6 +58,7 @@ Use only technologies named in the supplied requirements.
 | Runtime | Node.js |
 | HTTP API | Express.js and Express middleware |
 | Metadata database | MongoDB Atlas |
+| MongoDB object modeling | Mongoose, approved after the initial analysis |
 | Media storage | Cloudinary |
 | Authentication | JWT |
 | Multipart upload | Multer memory storage, streamed to Cloudinary |
@@ -68,7 +69,7 @@ Use only technologies named in the supplied requirements.
 | Tests | Jest or Mocha, with the final choice recorded before dependency installation |
 | Deployment | A deployment target allowed by the assessment, selected during the deployment phase |
 
-No additional database, cache, queue, search engine, object-storage provider, ORM/ODM, validation library, logging framework, test framework, or deployment service should be added merely by preference. If a package becomes necessary to implement an explicit requirement but is not named in the documents, its need must be reviewed before it is added.
+No additional database, cache, queue, search engine, object-storage provider, validation library, logging framework, test framework, or deployment service should be added merely by preference. Mongoose is the explicitly approved MongoDB ODM. If another package becomes necessary to implement an explicit requirement but is not named in the documents, its need must be reviewed before it is added.
 
 ## 6. Architecture
 
