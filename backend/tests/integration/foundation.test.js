@@ -12,6 +12,8 @@ const config = {
   refreshSessionTtlDays: 7,
   refreshCookieName: 'mediastream_refresh',
   cookieSameSite: 'lax',
+  cloudinary: { cloudName: 'test', apiKey: 'test', apiSecret: 'test' },
+  uploadLimitsBytes: { image: 10_485_760, video: 104_857_600, audio: 26_214_400, pdf: 20_971_520 },
 };
 const logger = { info: jest.fn(), error: jest.fn() };
 

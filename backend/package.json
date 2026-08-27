@@ -13,10 +13,12 @@
     "test:coverage": "node --experimental-vm-modules ./node_modules/jest/bin/jest.js --runInBand --coverage"
   },
   "dependencies": {
+    "cloudinary": "^2.10.1",
     "express": "^5.1.0",
     "helmet": "^8.1.0",
     "jsonwebtoken": "^9.0.3",
     "mongoose": "^8.18.0",
+    "multer": "^2.2.0",
     "swagger-ui-express": "^5.0.1"
   },
   "devDependencies": {

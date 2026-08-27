@@ -23,6 +23,7 @@ The process validates required environment variables before connecting to MongoD
 - `POST /api/v1/auth/refresh` - rotate the refresh session.
 - `POST /api/v1/auth/logout` - revoke the refresh session.
 - `GET /api/v1/auth/me` - return the authenticated user.
+- `POST /api/v1/media` - upload one authenticated image, video, audio, or PDF.
 - `GET /api-docs` - Swagger UI.
 - `GET /api-docs.json` - OpenAPI JSON.
 
@@ -32,4 +33,6 @@ The process validates required environment variables before connecting to MongoD
 - `npm run test:coverage`
 - `npm audit --audit-level=high`
 
-Authentication uses a 15-minute bearer JWT and a rotating seven-day HttpOnly refresh cookie. Media endpoints will be added on their planned feature branches.
+Authentication uses a 15-minute bearer JWT and a rotating seven-day HttpOnly refresh cookie. Remaining media CRUD and search endpoints will be added on their planned feature branches.
+
+Media uploads use Multer memory storage and stream directly to Cloudinary. Configure Cloudinary credentials and the per-type limits in `.env`; defaults are 10 MB for images, 100 MB for video, 25 MB for audio, and 20 MB for PDFs. The multipart fields are `file`, `title`, optional `description`, and optional comma-separated `tags`.

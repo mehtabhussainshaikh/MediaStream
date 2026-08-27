@@ -21,4 +21,13 @@ describe('auth OpenAPI contract', () => {
       refreshCookie: { type: 'apiKey', in: 'cookie', name: 'mediastream_refresh' },
     });
   });
+
+  test('documents authenticated multipart media upload and mandatory outcomes', () => {
+    const operation = openApiDocument.paths['/api/v1/media'].post;
+    expect(operation.security).toEqual([{ bearerAuth: [] }]);
+    expect(operation.requestBody.content).toHaveProperty('multipart/form-data');
+    expect(Object.keys(operation.responses)).toEqual(expect.arrayContaining([
+      '201', '400', '401', '413', '415', '500', '502',
+    ]));
+  });
 });

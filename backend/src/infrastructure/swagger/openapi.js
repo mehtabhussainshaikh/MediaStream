@@ -80,6 +80,37 @@ export const openApiDocument = Object.freeze({
         },
       },
     },
+    '/api/v1/media': {
+      post: {
+        tags: ['Media'], summary: 'Upload one image, video, audio, or PDF', security: [{ bearerAuth: [] }],
+        requestBody: {
+          required: true,
+          content: {
+            'multipart/form-data': {
+              schema: {
+                type: 'object', additionalProperties: false, required: ['file', 'title'],
+                properties: {
+                  file: { type: 'string', format: 'binary', description: 'One supported media file' },
+                  title: { type: 'string', minLength: 2, maxLength: 120 },
+                  description: { type: 'string', maxLength: 2000 },
+                  tags: { type: 'string', description: 'Comma-separated tags; maximum 10 unique tags, 30 characters each' },
+                },
+              },
+              encoding: { file: { contentType: 'image/jpeg, image/png, image/webp, image/gif, video/mp4, video/webm, video/quicktime, audio/mpeg, audio/wav, audio/ogg, audio/mp4, application/pdf' } },
+            },
+          },
+        },
+        responses: {
+          201: { description: 'Media uploaded and metadata persisted', content: { 'application/json': { schema: { $ref: '#/components/schemas/MediaResponse' } } } },
+          400: { $ref: '#/components/responses/ValidationError' },
+          401: { $ref: '#/components/responses/Unauthenticated' },
+          413: { description: 'File exceeds its media-type limit', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } },
+          415: { description: 'File MIME type is unsupported', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } },
+          500: { description: 'Metadata persistence failed after provider compensation', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } },
+          502: { description: 'Cloudinary operation failed', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } },
+        },
+      },
+    },
   },
   components: {
     securitySchemes: {
@@ -109,10 +140,12 @@ export const openApiDocument = Object.freeze({
       RegisterRequest: {
         type: 'object', additionalProperties: false, required: ['name', 'email', 'password'],
         properties: { name: { type: 'string', minLength: 2, maxLength: 80 }, email: { type: 'string', format: 'email' }, password: { type: 'string', format: 'password', minLength: 8, maxLength: 128 } },
+        example: { name: 'Media User', email: 'user@example.com', password: 'secure-password' },
       },
       LoginRequest: {
         type: 'object', additionalProperties: false, required: ['email', 'password'],
         properties: { email: { type: 'string', format: 'email' }, password: { type: 'string', format: 'password' } },
+        example: { email: 'user@example.com', password: 'secure-password' },
       },
       UserResponse: {
         type: 'object', required: ['success', 'data'],
@@ -124,6 +157,23 @@ export const openApiDocument = Object.freeze({
           success: { type: 'boolean', enum: [true] },
           data: { type: 'object', required: ['user', 'accessToken', 'expiresInSeconds'], properties: { user: { $ref: '#/components/schemas/User' }, accessToken: { type: 'string', description: '15-minute JWT access token' }, expiresInSeconds: { type: 'integer', enum: [900] } } },
         },
+      },
+      Media: {
+        type: 'object',
+        required: ['_id', 'ownerId', 'title', 'tags', 'originalName', 'mimeType', 'extension', 'sizeBytes', 'mediaType', 'publicId', 'resourceType', 'secureUrl', 'format', 'status', 'viewCount', 'createdAt', 'updatedAt'],
+        properties: {
+          _id: { type: 'string' }, ownerId: { type: 'string' }, title: { type: 'string' }, description: { type: 'string' },
+          tags: { type: 'array', items: { type: 'string' } }, originalName: { type: 'string' }, mimeType: { type: 'string' }, extension: { type: 'string' },
+          sizeBytes: { type: 'integer', minimum: 1 }, mediaType: { type: 'string', enum: ['image', 'video', 'audio', 'pdf'] },
+          publicId: { type: 'string' }, resourceType: { type: 'string', enum: ['image', 'video', 'raw'] }, secureUrl: { type: 'string', format: 'uri' }, format: { type: 'string' },
+          dimensions: { type: 'object', properties: { width: { type: 'integer' }, height: { type: 'integer' } } }, duration: { type: 'number', minimum: 0 },
+          status: { type: 'string', enum: ['uploading', 'ready', 'failed'] }, viewCount: { type: 'integer', minimum: 0 },
+          createdAt: { type: 'string', format: 'date-time' }, updatedAt: { type: 'string', format: 'date-time' },
+        },
+      },
+      MediaResponse: {
+        type: 'object', required: ['success', 'data'],
+        properties: { success: { type: 'boolean', enum: [true] }, data: { type: 'object', required: ['media'], properties: { media: { $ref: '#/components/schemas/Media' } } } },
       },
       HealthResponse: {
         type: 'object',

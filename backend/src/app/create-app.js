@@ -6,8 +6,9 @@ import { errorHandler, notFound } from '../middleware/error-handler.js';
 import { requestContext } from '../middleware/request-context.js';
 import { openApiDocument } from '../infrastructure/swagger/openapi.js';
 import { buildAuthModule, createAuthRouter } from '../features/auth/auth.routes.js';
+import { buildMediaUploadModule, createMediaUploadRouter } from '../features/media/media-upload.routes.js';
 
-export function createApp({ config, database, logger, authModule }) {
+export function createApp({ config, database, logger, authModule, mediaUploadModule }) {
   const app = express();
   app.disable('x-powered-by');
   if (config.isProduction) {
@@ -25,6 +26,12 @@ export function createApp({ config, database, logger, authModule }) {
 
   const resolvedAuthModule = authModule || buildAuthModule({ config });
   app.use('/api/v1/auth', createAuthRouter({ ...resolvedAuthModule, config }));
+  const resolvedMediaUploadModule = mediaUploadModule || buildMediaUploadModule({ config, logger });
+  app.use('/api/v1/media', createMediaUploadRouter({
+    ...resolvedMediaUploadModule,
+    authenticate: resolvedAuthModule.authenticate,
+    config,
+  }));
 
   app.get('/health', (request, response) => {
     const ready = request.app.locals.database.isReady();
