@@ -417,9 +417,7 @@ The media-search phase uses these locked decisions:
 - `from` and `to` use inclusive UTC calendar-day bounds in strict `YYYY-MM-DD` format.
 - Relevance ties use `viewCount` descending, `createdAt` descending, then `_id` ascending; non-text sorts also use `_id` ascending as their final stable tie-breaker.
 
-The following phase-specific decision remains to be locked before its related implementation begins:
-
-- Deployment target from the examples permitted by the assessment.
+The deployment phase uses Railway, selected from the assessment's permitted examples. The service root is `/backend`, the start command is `npm start`, the health-check path is `/health`, and platform environment variables provide production configuration. Live deployment remains pending external Railway project creation and authentication.
 
 None of these decisions authorizes adding unrelated infrastructure.
 
