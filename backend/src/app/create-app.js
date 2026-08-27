@@ -8,8 +8,17 @@ import { openApiDocument } from '../infrastructure/swagger/openapi.js';
 import { buildAuthModule, createAuthRouter } from '../features/auth/auth.routes.js';
 import { buildMediaUploadModule, createMediaUploadRouter } from '../features/media/media-upload.routes.js';
 import { buildMediaCrudModule, createMediaCrudRouter } from '../features/media/media-crud.routes.js';
+import { buildMediaSearchModule, createMediaSearchRouter } from '../features/media/media-search.routes.js';
 
-export function createApp({ config, database, logger, authModule, mediaUploadModule, mediaCrudModule }) {
+export function createApp({
+  config,
+  database,
+  logger,
+  authModule,
+  mediaUploadModule,
+  mediaCrudModule,
+  mediaSearchModule,
+}) {
   const app = express();
   app.disable('x-powered-by');
   if (config.isProduction) {
@@ -34,6 +43,11 @@ export function createApp({ config, database, logger, authModule, mediaUploadMod
     config,
   }));
   const resolvedMediaCrudModule = mediaCrudModule || buildMediaCrudModule({ config });
+  const resolvedMediaSearchModule = mediaSearchModule || buildMediaSearchModule();
+  app.use('/api/v1/media', createMediaSearchRouter({
+    ...resolvedMediaSearchModule,
+    authenticate: resolvedAuthModule.authenticate,
+  }));
   app.use('/api/v1/media', createMediaCrudRouter({
     ...resolvedMediaCrudModule,
     authenticate: resolvedAuthModule.authenticate,

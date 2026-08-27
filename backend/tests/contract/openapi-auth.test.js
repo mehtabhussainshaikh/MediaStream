@@ -43,4 +43,14 @@ describe('auth OpenAPI contract', () => {
     expect(item.patch.requestBody.content['application/json'].schema)
       .toEqual({ $ref: '#/components/schemas/MediaMetadataPatch' });
   });
+
+  test('documents search filters, pagination, and atomic view increments', () => {
+    const search = openApiDocument.paths['/api/v1/media'].get;
+    expect(search.parameters.map(({ name }) => name)).toEqual([
+      'q', 'type', 'tags', 'from', 'to', 'sort', 'page', 'limit',
+    ]);
+    expect(Object.keys(search.responses)).toEqual(expect.arrayContaining(['200', '400', '401']));
+    const view = openApiDocument.paths['/api/v1/media/{id}/view'].post;
+    expect(Object.keys(view.responses)).toEqual(expect.arrayContaining(['200', '400', '401', '404']));
+  });
 });

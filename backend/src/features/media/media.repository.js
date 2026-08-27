@@ -27,5 +27,19 @@ export function createMediaRepository(model = Media) {
     async deleteById(id) {
       return model.findByIdAndDelete(id).lean();
     },
+    async search({ filter, projection, sort, skip, limit }) {
+      const [items, total] = await Promise.all([
+        model.find(filter, projection).sort(sort).skip(skip).limit(limit).lean(),
+        model.countDocuments(filter),
+      ]);
+      return { items, total };
+    },
+    async incrementView(id) {
+      return model.findOneAndUpdate(
+        { _id: id, status: 'ready' },
+        { $inc: { viewCount: 1 } },
+        { new: true },
+      ).lean();
+    },
   });
 }

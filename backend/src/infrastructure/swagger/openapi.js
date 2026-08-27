@@ -81,6 +81,25 @@ export const openApiDocument = Object.freeze({
       },
     },
     '/api/v1/media': {
+      get: {
+        tags: ['Media'], summary: 'Search, filter, rank, and paginate ready media', security: [{ bearerAuth: [] }],
+        description: 'Text queries always use weighted relevance. Without q, the default sort is newest. Tags use an all-tags match and date bounds are inclusive UTC days.',
+        parameters: [
+          { name: 'q', in: 'query', schema: { type: 'string', minLength: 1, maxLength: 200 }, description: 'Weighted text search over title, original filename, tags, and description' },
+          { name: 'type', in: 'query', schema: { type: 'string', enum: ['image', 'video', 'audio', 'pdf'] } },
+          { name: 'tags', in: 'query', schema: { type: 'string' }, description: 'Comma-separated tags; every supplied tag must match' },
+          { name: 'from', in: 'query', schema: { type: 'string', format: 'date', example: '2026-01-01' } },
+          { name: 'to', in: 'query', schema: { type: 'string', format: 'date', example: '2026-12-31' } },
+          { name: 'sort', in: 'query', schema: { type: 'string', enum: ['relevance', 'newest', 'oldest', 'mostViewed'] } },
+          { name: 'page', in: 'query', schema: { type: 'integer', minimum: 1, default: 1 } },
+          { name: 'limit', in: 'query', schema: { type: 'integer', minimum: 1, maximum: 50, default: 20 } },
+        ],
+        responses: {
+          200: { description: 'Deterministically ranked paginated media', content: { 'application/json': { schema: { $ref: '#/components/schemas/MediaListResponse' } } } },
+          400: { $ref: '#/components/responses/ValidationError' },
+          401: { $ref: '#/components/responses/Unauthenticated' },
+        },
+      },
       post: {
         tags: ['Media'], summary: 'Upload one image, video, audio, or PDF', security: [{ bearerAuth: [] }],
         requestBody: {
@@ -159,6 +178,18 @@ export const openApiDocument = Object.freeze({
         },
       },
     },
+    '/api/v1/media/{id}/view': {
+      parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'string', pattern: '^[a-fA-F0-9]{24}$' } }],
+      post: {
+        tags: ['Media'], summary: 'Atomically increment a ready media view count', security: [{ bearerAuth: [] }],
+        responses: {
+          200: { description: 'View count incremented and updated media returned', content: { 'application/json': { schema: { $ref: '#/components/schemas/MediaResponse' } } } },
+          400: { $ref: '#/components/responses/ValidationError' },
+          401: { $ref: '#/components/responses/Unauthenticated' },
+          404: { $ref: '#/components/responses/MediaNotFound' },
+        },
+      },
+    },
   },
   components: {
     securitySchemes: {
@@ -218,6 +249,7 @@ export const openApiDocument = Object.freeze({
           publicId: { type: 'string' }, resourceType: { type: 'string', enum: ['image', 'video', 'raw'] }, secureUrl: { type: 'string', format: 'uri' }, format: { type: 'string' },
           dimensions: { type: 'object', properties: { width: { type: 'integer' }, height: { type: 'integer' } } }, duration: { type: 'number', minimum: 0 },
           status: { type: 'string', enum: ['uploading', 'ready', 'failed'] }, viewCount: { type: 'integer', minimum: 0 },
+          score: { type: 'number', description: 'MongoDB text score; present for relevance searches' },
           createdAt: { type: 'string', format: 'date-time' }, updatedAt: { type: 'string', format: 'date-time' },
         },
       },

@@ -52,4 +52,32 @@ describe('media repository', () => {
     );
     await expect(repository.deleteById('media-id')).resolves.toBe(updated);
   });
+
+  test('executes a ranked paginated search and atomically increments views', async () => {
+    const items = [{ _id: 'media-id', viewCount: 1 }];
+    const searchQuery = {
+      sort: jest.fn(() => searchQuery), skip: jest.fn(() => searchQuery),
+      limit: jest.fn(() => searchQuery), lean: jest.fn(async () => items),
+    };
+    const incrementQuery = leanQuery({ _id: 'media-id', viewCount: 2 });
+    const model = {
+      find: jest.fn(() => searchQuery), countDocuments: jest.fn(async () => 1),
+      findOneAndUpdate: jest.fn(() => incrementQuery),
+    };
+    const repository = createMediaRepository(model);
+    const query = {
+      filter: { $text: { $search: 'launch' } }, projection: { score: { $meta: 'textScore' } },
+      sort: { score: { $meta: 'textScore' } }, skip: 0, limit: 20,
+    };
+    await expect(repository.search(query)).resolves.toEqual({ items, total: 1 });
+    expect(model.find).toHaveBeenCalledWith(query.filter, query.projection);
+    expect(searchQuery.sort).toHaveBeenCalledWith(query.sort);
+
+    await expect(repository.incrementView('media-id')).resolves.toMatchObject({ viewCount: 2 });
+    expect(model.findOneAndUpdate).toHaveBeenCalledWith(
+      { _id: 'media-id', status: 'ready' },
+      { $inc: { viewCount: 1 } },
+      { new: true },
+    );
+  });
 });
