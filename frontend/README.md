@@ -1,0 +1,49 @@
+# MediaStream Frontend
+
+React interface for secure multimedia upload, server-ranked search, preview, metadata editing, and deletion.
+
+## Local setup
+
+Requirements: Node.js 20.19 or newer and the MediaStream backend running on port 3000.
+
+```bash
+cd frontend
+cp .env.example .env
+npm install
+npm run dev
+```
+
+Open `http://localhost:5173`. Set the backend `FRONTEND_ORIGIN` to that exact origin so credentialed refresh-cookie requests pass CORS.
+
+## Environment
+
+`VITE_API_BASE_URL` is the backend origin without `/api/v1`. The optional media size variables mirror backend limits and are used only for early client feedback. Backend validation remains authoritative.
+
+Access and refresh tokens are never written to local storage. The access token remains in Redux memory; the backend owns the HttpOnly refresh cookie. API requests send `credentials: include` and perform at most one refresh attempt after a `401`.
+
+## Commands
+
+```bash
+npm run lint
+npm test
+npm run test:coverage
+npm run build
+npm run preview
+```
+
+## Routes
+
+| Route | Access | Purpose |
+| --- | --- | --- |
+| `/register` | Public only | Create account |
+| `/login` | Public only | Sign in and restore intended destination |
+| `/media` | Authenticated | URL-backed search, filters, server ranking, pagination |
+| `/media/mine` | Authenticated | Current user's uploads |
+| `/media/upload` | Authenticated | Validated drag/drop upload and local preview |
+| `/media/:id` | Authenticated | Preview, view event, metadata, owner edit/delete |
+
+## Deployment
+
+Build with `npm run build` and deploy `dist/` to Vercel or another static host with SPA fallback enabled. Set `VITE_API_BASE_URL` at build time. The backend must allow the exact deployed frontend origin and use a compatible secure `SameSite` cookie policy.
+
+No live URL is included because hosting credentials and live MongoDB/Cloudinary configuration are not present in this workspace.
