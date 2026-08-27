@@ -5,8 +5,9 @@ import { corsForOrigin } from '../middleware/cors.js';
 import { errorHandler, notFound } from '../middleware/error-handler.js';
 import { requestContext } from '../middleware/request-context.js';
 import { openApiDocument } from '../infrastructure/swagger/openapi.js';
+import { buildAuthModule, createAuthRouter } from '../features/auth/auth.routes.js';
 
-export function createApp({ config, database, logger }) {
+export function createApp({ config, database, logger, authModule }) {
   const app = express();
   app.disable('x-powered-by');
   if (config.isProduction) {
@@ -21,6 +22,9 @@ export function createApp({ config, database, logger }) {
   app.use(helmet());
   app.use(corsForOrigin(config.frontendOrigin));
   app.use(express.json({ limit: config.jsonBodyLimit }));
+
+  const resolvedAuthModule = authModule || buildAuthModule({ config });
+  app.use('/api/v1/auth', createAuthRouter({ ...resolvedAuthModule, config }));
 
   app.get('/health', (request, response) => {
     const ready = request.app.locals.database.isReady();
@@ -41,4 +45,3 @@ export function createApp({ config, database, logger }) {
   app.use(errorHandler);
   return app;
 }
-

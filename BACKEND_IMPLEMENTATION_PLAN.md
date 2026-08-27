@@ -55,7 +55,7 @@ Use only technologies named in the supplied requirements.
 
 | Concern | Required technology or approach |
 | --- | --- |
-| Runtime | Node.js |
+| Runtime | Node.js 24 or newer, JavaScript ESM |
 | HTTP API | Express.js and Express middleware |
 | Metadata database | MongoDB Atlas |
 | MongoDB object modeling | Mongoose, approved after the initial analysis |
@@ -66,7 +66,7 @@ Use only technologies named in the supplied requirements.
 | API verification | Postman |
 | Source control | Git/GitHub |
 | Security middleware | Helmet |
-| Tests | Jest or Mocha, with the final choice recorded before dependency installation |
+| Tests | Jest |
 | Deployment | A deployment target allowed by the assessment, selected during the deployment phase |
 
 No additional database, cache, queue, search engine, object-storage provider, validation library, logging framework, test framework, or deployment service should be added merely by preference. Mongoose is the explicitly approved MongoDB ODM. If another package becomes necessary to implement an explicit requirement but is not named in the documents, its need must be reviewed before it is added.
@@ -388,20 +388,25 @@ develop
 
 Do not mix frontend work into these branches. Do not start multiple dependent phases before the previous exit gate is complete.
 
-## 17. Decisions that must be recorded before implementation
+## 17. Implementation decisions
 
-The source documents intentionally leave some exact values or choices open. These must be selected and documented without expanding the technology stack:
+The following decisions are locked:
 
-- Exact Node.js version.
-- JavaScript module convention and code style already supported by the repository.
-- Jest versus Mocha for tests; use one, not both, unless a supplied repository convention already decides it.
+- Node.js 24 or newer with JavaScript ESM.
+- Jest as the only test framework.
+- Mongoose for MongoDB schemas, validation, indexes, and model access.
+- A 15-minute HS256 JWT access token.
+- A rotating 32-byte opaque refresh token persisted only as a SHA-256 hash in a seven-day session.
+- Refresh cookie name `mediastream_refresh`, path `/api/v1/auth`, `HttpOnly`, `Secure` in production, `SameSite=Lax` by default locally, and explicitly configurable to `None` for cross-site production deployment.
+- `/health` remains unversioned; feature endpoints use `/api/v1`.
+- Structured JSON logging uses the existing application logger without an additional logging framework.
+
+The following phase-specific decisions remain to be locked before their related implementation begins:
+
 - Exact supported MIME allowlist and configurable size limit for each of image, video, audio, and PDF.
-- Refresh-cookie name, path, domain behavior, and explicit `SameSite` value for local and production environments.
 - Allowed search `sort` values and default behavior when `q` is absent.
 - Tag normalization, maximum tag count, and metadata length limits not already specified.
-- Whether `/health` remains unversioned as written or is also exposed under `/api/v1`; avoid duplicate public contracts unless required.
 - Deployment target from the examples permitted by the assessment.
-- Logging implementation that satisfies structured logging and redaction without adding an unapproved technology.
 
 None of these decisions authorizes adding unrelated infrastructure.
 

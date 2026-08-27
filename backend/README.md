@@ -18,6 +18,11 @@ The process validates required environment variables before connecting to MongoD
 ## Available endpoints
 
 - `GET /health` - liveness and MongoDB readiness.
+- `POST /api/v1/auth/register` - create an account.
+- `POST /api/v1/auth/login` - create an authenticated session.
+- `POST /api/v1/auth/refresh` - rotate the refresh session.
+- `POST /api/v1/auth/logout` - revoke the refresh session.
+- `GET /api/v1/auth/me` - return the authenticated user.
 - `GET /api-docs` - Swagger UI.
 - `GET /api-docs.json` - OpenAPI JSON.
 
@@ -27,4 +32,4 @@ The process validates required environment variables before connecting to MongoD
 - `npm run test:coverage`
 - `npm audit --audit-level=high`
 
-Authentication and media endpoints will be added on their planned feature branches.
+Authentication uses a 15-minute bearer JWT and a rotating seven-day HttpOnly refresh cookie. Media endpoints will be added on their planned feature branches.
