@@ -30,4 +30,17 @@ describe('auth OpenAPI contract', () => {
       '201', '400', '401', '413', '415', '500', '502',
     ]));
   });
+
+  test('documents owner listing, details, metadata updates, and deletion', () => {
+    const mine = openApiDocument.paths['/api/v1/media/mine'].get;
+    expect(mine.security).toEqual([{ bearerAuth: [] }]);
+    expect(Object.keys(mine.responses)).toEqual(expect.arrayContaining(['200', '400', '401']));
+
+    const item = openApiDocument.paths['/api/v1/media/{id}'];
+    expect(Object.keys(item.get.responses)).toEqual(expect.arrayContaining(['200', '400', '401', '404']));
+    expect(Object.keys(item.patch.responses)).toEqual(expect.arrayContaining(['200', '400', '401', '403', '404']));
+    expect(Object.keys(item.delete.responses)).toEqual(expect.arrayContaining(['200', '400', '401', '403', '404', '502']));
+    expect(item.patch.requestBody.content['application/json'].schema)
+      .toEqual({ $ref: '#/components/schemas/MediaMetadataPatch' });
+  });
 });

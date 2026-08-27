@@ -24,6 +24,10 @@ The process validates required environment variables before connecting to MongoD
 - `POST /api/v1/auth/logout` - revoke the refresh session.
 - `GET /api/v1/auth/me` - return the authenticated user.
 - `POST /api/v1/media` - upload one authenticated image, video, audio, or PDF.
+- `GET /api/v1/media/mine` - list the current user's uploads.
+- `GET /api/v1/media/:id` - return authenticated media details.
+- `PATCH /api/v1/media/:id` - update owner/admin-controlled title, description, or tags.
+- `DELETE /api/v1/media/:id` - delete an owner/admin-controlled provider asset and metadata.
 - `GET /api-docs` - Swagger UI.
 - `GET /api-docs.json` - OpenAPI JSON.
 

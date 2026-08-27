@@ -6,6 +6,26 @@ export function createMediaRepository(model = Media) {
       const document = await model.create(input);
       return document.toObject ? document.toObject() : document;
     },
+    async findById(id) {
+      return model.findById(id).lean();
+    },
+    async listByOwner(ownerId, { skip, limit }) {
+      const filter = { ownerId };
+      const [items, total] = await Promise.all([
+        model.find(filter).sort({ createdAt: -1, _id: -1 }).skip(skip).limit(limit).lean(),
+        model.countDocuments(filter),
+      ]);
+      return { items, total };
+    },
+    async updateMetadata(id, metadata) {
+      return model.findByIdAndUpdate(
+        id,
+        { $set: metadata },
+        { new: true, runValidators: true },
+      ).lean();
+    },
+    async deleteById(id) {
+      return model.findByIdAndDelete(id).lean();
+    },
   });
 }
-

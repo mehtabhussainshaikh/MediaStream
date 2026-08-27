@@ -111,6 +111,54 @@ export const openApiDocument = Object.freeze({
         },
       },
     },
+    '/api/v1/media/mine': {
+      get: {
+        tags: ['Media'], summary: "List the current user's uploads", security: [{ bearerAuth: [] }],
+        parameters: [
+          { name: 'page', in: 'query', schema: { type: 'integer', minimum: 1, default: 1 } },
+          { name: 'limit', in: 'query', schema: { type: 'integer', minimum: 1, maximum: 50, default: 20 } },
+        ],
+        responses: {
+          200: { description: 'Paginated owner uploads', content: { 'application/json': { schema: { $ref: '#/components/schemas/MediaListResponse' } } } },
+          400: { $ref: '#/components/responses/ValidationError' },
+          401: { $ref: '#/components/responses/Unauthenticated' },
+        },
+      },
+    },
+    '/api/v1/media/{id}': {
+      parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'string', pattern: '^[a-fA-F0-9]{24}$' } }],
+      get: {
+        tags: ['Media'], summary: 'Return media details and preview metadata', security: [{ bearerAuth: [] }],
+        responses: {
+          200: { description: 'Media details', content: { 'application/json': { schema: { $ref: '#/components/schemas/MediaResponse' } } } },
+          400: { $ref: '#/components/responses/ValidationError' },
+          401: { $ref: '#/components/responses/Unauthenticated' },
+          404: { $ref: '#/components/responses/MediaNotFound' },
+        },
+      },
+      patch: {
+        tags: ['Media'], summary: 'Edit owner-controlled media metadata', security: [{ bearerAuth: [] }],
+        requestBody: { required: true, content: { 'application/json': { schema: { $ref: '#/components/schemas/MediaMetadataPatch' } } } },
+        responses: {
+          200: { description: 'Media metadata updated', content: { 'application/json': { schema: { $ref: '#/components/schemas/MediaResponse' } } } },
+          400: { $ref: '#/components/responses/ValidationError' },
+          401: { $ref: '#/components/responses/Unauthenticated' },
+          403: { $ref: '#/components/responses/Forbidden' },
+          404: { $ref: '#/components/responses/MediaNotFound' },
+        },
+      },
+      delete: {
+        tags: ['Media'], summary: 'Delete a media asset and its metadata', security: [{ bearerAuth: [] }],
+        responses: {
+          200: { description: 'Provider asset and metadata deleted', content: { 'application/json': { schema: { $ref: '#/components/schemas/MediaDeleteResponse' } } } },
+          400: { $ref: '#/components/responses/ValidationError' },
+          401: { $ref: '#/components/responses/Unauthenticated' },
+          403: { $ref: '#/components/responses/Forbidden' },
+          404: { $ref: '#/components/responses/MediaNotFound' },
+          502: { description: 'Cloudinary deletion failed; metadata was preserved', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } },
+        },
+      },
+    },
   },
   components: {
     securitySchemes: {
@@ -124,6 +172,8 @@ export const openApiDocument = Object.freeze({
     responses: {
       ValidationError: { description: 'Request validation failed', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } },
       Unauthenticated: { description: 'Authentication failed', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } },
+      Forbidden: { description: 'Owner or admin access is required', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } },
+      MediaNotFound: { description: 'Media record was not found', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } },
     },
     schemas: {
       User: {
@@ -174,6 +224,37 @@ export const openApiDocument = Object.freeze({
       MediaResponse: {
         type: 'object', required: ['success', 'data'],
         properties: { success: { type: 'boolean', enum: [true] }, data: { type: 'object', required: ['media'], properties: { media: { $ref: '#/components/schemas/Media' } } } },
+      },
+      MediaMetadataPatch: {
+        type: 'object', additionalProperties: false, minProperties: 1,
+        properties: {
+          title: { type: 'string', minLength: 2, maxLength: 120 },
+          description: { type: 'string', maxLength: 2000 },
+          tags: { type: 'array', maxItems: 10, uniqueItems: true, items: { type: 'string', maxLength: 30 } },
+        },
+        example: { title: 'Updated launch media', description: 'Updated description', tags: ['launch', 'demo'] },
+      },
+      PaginationMeta: {
+        type: 'object', required: ['page', 'limit', 'total', 'totalPages', 'hasNextPage', 'hasPreviousPage'],
+        properties: {
+          page: { type: 'integer' }, limit: { type: 'integer' }, total: { type: 'integer' }, totalPages: { type: 'integer' },
+          hasNextPage: { type: 'boolean' }, hasPreviousPage: { type: 'boolean' },
+        },
+      },
+      MediaListResponse: {
+        type: 'object', required: ['success', 'data', 'meta'],
+        properties: {
+          success: { type: 'boolean', enum: [true] },
+          data: { type: 'object', required: ['media'], properties: { media: { type: 'array', items: { $ref: '#/components/schemas/Media' } } } },
+          meta: { $ref: '#/components/schemas/PaginationMeta' },
+        },
+      },
+      MediaDeleteResponse: {
+        type: 'object', required: ['success', 'data'],
+        properties: {
+          success: { type: 'boolean', enum: [true] },
+          data: { type: 'object', required: ['id', 'deleted'], properties: { id: { type: 'string' }, deleted: { type: 'boolean', enum: [true] } } },
+        },
       },
       HealthResponse: {
         type: 'object',
