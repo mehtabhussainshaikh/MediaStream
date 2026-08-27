@@ -401,11 +401,17 @@ The following decisions are locked:
 - `/health` remains unversioned; feature endpoints use `/api/v1`.
 - Structured JSON logging uses the existing application logger without an additional logging framework.
 
+The media-upload phase uses these locked decisions:
+
+- MIME allowlist: JPEG, PNG, WebP, and GIF images; MP4, WebM, and QuickTime video; MP3, WAV, OGG, and M4A audio; and PDF.
+- Default configurable limits: image 10 MB, video 100 MB, audio 25 MB, and PDF 20 MB.
+- Upload field name `file`; `tags` is a comma-separated multipart field normalized to unique lowercase values.
+- Metadata limits: title 2-120 characters, description at most 2000 characters, at most 10 tags, and each tag at most 30 characters.
+- Cloudinary resource types: images and PDFs use `image`; video and audio use `video`.
+
 The following phase-specific decisions remain to be locked before their related implementation begins:
 
-- Exact supported MIME allowlist and configurable size limit for each of image, video, audio, and PDF.
 - Allowed search `sort` values and default behavior when `q` is absent.
-- Tag normalization, maximum tag count, and metadata length limits not already specified.
 - Deployment target from the examples permitted by the assessment.
 
 None of these decisions authorizes adding unrelated infrastructure.

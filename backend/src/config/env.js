@@ -70,5 +70,16 @@ export function loadConfig(source = process.env) {
     refreshSessionTtlDays: 7,
     refreshCookieName: 'mediastream_refresh',
     cookieSameSite: sameSitePolicy(source, isProduction),
+    cloudinary: Object.freeze({
+      cloudName: requiredString(source, 'CLOUDINARY_CLOUD_NAME'),
+      apiKey: requiredString(source, 'CLOUDINARY_API_KEY'),
+      apiSecret: requiredString(source, 'CLOUDINARY_API_SECRET'),
+    }),
+    uploadLimitsBytes: Object.freeze({
+      image: positiveInteger(source, 'MAX_IMAGE_SIZE_MB', 10) * 1024 * 1024,
+      video: positiveInteger(source, 'MAX_VIDEO_SIZE_MB', 100) * 1024 * 1024,
+      audio: positiveInteger(source, 'MAX_AUDIO_SIZE_MB', 25) * 1024 * 1024,
+      pdf: positiveInteger(source, 'MAX_PDF_SIZE_MB', 20) * 1024 * 1024,
+    }),
   });
 }

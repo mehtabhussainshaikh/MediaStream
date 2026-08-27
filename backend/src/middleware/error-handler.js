@@ -1,4 +1,5 @@
 import { AppError } from '../shared/app-error.js';
+import multer from 'multer';
 
 export function notFound(request, response, next) {
   next(new AppError({
@@ -23,6 +24,14 @@ export function errorHandler(error, request, response, _next) {
       code: 'PAYLOAD_TOO_LARGE',
       message: 'Request body exceeds the allowed size',
       cause: error,
+    });
+  } else if (error instanceof multer.MulterError && error.code === 'LIMIT_FILE_SIZE') {
+    normalizedError = new AppError({
+      status: 413, code: 'FILE_TOO_LARGE', message: 'File exceeds the maximum upload size', cause: error,
+    });
+  } else if (error instanceof multer.MulterError) {
+    normalizedError = new AppError({
+      status: 400, code: 'VALIDATION_ERROR', message: 'Multipart upload is invalid', cause: error,
     });
   }
 

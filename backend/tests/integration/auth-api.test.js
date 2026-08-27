@@ -7,6 +7,8 @@ const user = { _id: '507f1f77bcf86cd799439011', name: 'Media User', email: 'user
 const config = {
   nodeEnv: 'test', isProduction: false, frontendOrigin: 'http://localhost:5173', jsonBodyLimit: '10kb',
   refreshSessionTtlDays: 7, refreshCookieName: 'mediastream_refresh', cookieSameSite: 'lax',
+  cloudinary: { cloudName: 'test', apiKey: 'test', apiSecret: 'test' },
+  uploadLimitsBytes: { image: 10_485_760, video: 104_857_600, audio: 26_214_400, pdf: 20_971_520 },
 };
 const logger = { info: jest.fn(), error: jest.fn() };
 const database = { isReady: () => true };
