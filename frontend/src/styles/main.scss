@@ -19,6 +19,7 @@ p { max-width: 68ch; }
 .brand__mark { display: grid; place-items: center; width: 2.25rem; aspect-ratio: 1; border: 1px solid tokens.$ink; border-radius: 50%; font-size: 1rem; }
 .site-header nav { display: flex; gap: 1.25rem; align-items: center; }
 .site-header nav a { font-size: .84rem; text-transform: uppercase; letter-spacing: .12em; text-decoration: none; }
+.nav-button { border: 0; padding: 0; background: none; color: inherit; font-size: .84rem; text-transform: uppercase; letter-spacing: .12em; cursor: pointer; }
 .site-header nav a.active { color: tokens.$burgundy; border-bottom: 1px solid currentColor; }
 main { min-height: calc(100vh - 150px); }
 .page { width: min(1180px, calc(100% - 2rem)); margin: 0 auto; padding: clamp(2rem, 6vw, 5rem) 0; }
@@ -31,6 +32,22 @@ main { min-height: calc(100vh - 150px); }
 .button:disabled { opacity: .55; cursor: not-allowed; transform: none; }
 .button--secondary { color: tokens.$ink; background: transparent; }
 .button--text { min-height: auto; padding: 0; border: 0; background: none; color: inherit; text-decoration: underline; }
+.button--wide { width: 100%; margin-top: .5rem; }
+.auth-loading { min-height: 100vh; display: flex; justify-content: center; align-items: center; gap: 1rem; color: tokens.$muted; }
+.auth-page { width: min(1120px, calc(100% - 2rem)); min-height: calc(100vh - 150px); margin: 0 auto; display: grid; grid-template-columns: 1.1fr .9fr; gap: clamp(2rem, 7vw, 7rem); align-items: center; padding: 3rem 0; }
+.auth-copy p:not(.eyebrow) { color: tokens.$muted; font-family: tokens.$serif; font-size: 1.2rem; }
+.form-card { position: relative; padding: clamp(1.5rem, 5vw, 3.5rem); border: 1px solid tokens.$line; background: tokens.$surface; box-shadow: 16px 16px 0 rgba(tokens.$gold, .13); }
+.form-card h2 { margin: 0 0 1.5rem; font-size: 2rem; }
+.form-card__number { position: absolute; right: 1.5rem; top: 1rem; color: tokens.$line; font-family: tokens.$serif; font-size: 2rem; margin: 0; }
+.form-card__switch { margin: 1.25rem 0 0; color: tokens.$muted; font-size: .9rem; }
+.field { display: grid; gap: .35rem; margin-bottom: 1rem; }
+.field label { font-size: .78rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+.field input, .field textarea, .field select { width: 100%; min-height: 48px; border: 1px solid tokens.$line; border-radius: 0; background: #fff; color: tokens.$ink; padding: .65rem .75rem; }
+.field textarea { min-height: 120px; resize: vertical; }
+.field [aria-invalid='true'] { border-color: tokens.$burgundy; }
+.field__hint { color: tokens.$muted; font-size: .78rem; }
+.field__error { color: tokens.$burgundy; font-size: .8rem; }
+.status-message { padding: .7rem .85rem; background: #edf1e6; border-left: 3px solid #657443; }
 .empty-state { width: min(620px, calc(100% - 2rem)); margin: 0 auto; min-height: 60vh; display: grid; align-content: center; justify-items: center; text-align: center; }
 .empty-state h1 { font-size: clamp(2rem, 5vw, 3.5rem); }
 .empty-state__ornament { color: tokens.$gold; font-size: 2rem; }
@@ -39,5 +56,6 @@ main { min-height: calc(100vh - 150px); }
 .skeleton-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.25rem; }
 .skeleton-card { min-height: 280px; border: 1px solid tokens.$line; background: linear-gradient(100deg, #e9e2d6 20%, #f9f5ed 40%, #e9e2d6 60%); background-size: 200% 100%; animation: shimmer 1.4s infinite; }
 @keyframes shimmer { to { background-position-x: -200%; } }
+@media (max-width: 760px) { .auth-page { grid-template-columns: 1fr; } .auth-copy { padding-top: 2rem; } .auth-copy h1 { font-size: 3rem; } .site-header nav a:not(.active), .site-header nav .nav-button { display: none; } }
 @media (max-width: 560px) { .site-header { min-height: 66px; } .site-footer { flex-direction: column; } }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; transition-duration: .01ms !important; } }
