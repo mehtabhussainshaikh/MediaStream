@@ -11,7 +11,7 @@ Phase 1 provides the Express application foundation, Mongoose-managed MongoDB li
 
 1. Copy `.env.example` to `.env` and replace every example value.
 2. Install dependencies with `npm install`.
-3. Start the API with `npm run dev`.
+3. Start the API with `npm run dev`. The development and start scripts load `backend/.env` when it exists; production platforms may inject the same variables directly.
 
 The process validates required environment variables before connecting to MongoDB. It exits on invalid configuration or a failed database connection.
 
