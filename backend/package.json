@@ -20,9 +20,12 @@
     "jsonwebtoken": "^9.0.3",
     "mongoose": "^8.18.0",
     "multer": "^2.2.0",
+    "socket.io": "^4.8.1",
+    "socket.io": "^4.8.3",
     "swagger-ui-express": "^5.0.1"
   },
   "devDependencies": {
-    "jest": "^30.0.5"
+    "jest": "^30.0.5",
+    "socket.io-client": "^4.8.1"
   }
 }

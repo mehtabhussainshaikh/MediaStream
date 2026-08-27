@@ -4,6 +4,7 @@ export async function startServer({
   config,
   logger,
   installSignalHandlers = true,
+  realtime,
 }) {
   await database.connect();
 
@@ -11,6 +12,7 @@ export async function startServer({
     const instance = app.listen(config.port, () => resolve(instance));
     instance.once('error', reject);
   });
+  realtime?.attach(server);
 
   logger.info('server_started', { port: config.port, environment: config.nodeEnv });
 
@@ -26,7 +28,8 @@ export async function startServer({
     }, config.shutdownTimeoutMs);
     forceExit.unref();
 
-    await new Promise((resolve) => server.close(resolve));
+    await realtime?.close();
+    if (server.listening) await new Promise((resolve) => server.close(resolve));
     await database.close();
     clearTimeout(forceExit);
     logger.info('shutdown_complete', { signal });
