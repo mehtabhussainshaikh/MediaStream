@@ -48,6 +48,13 @@ export function errorHandler(error, request, response, _next) {
       name: normalizedError.name,
       code,
       message,
+      ...(normalizedError.cause && {
+        cause: {
+          name: normalizedError.cause.name,
+          message: normalizedError.cause.message,
+          httpCode: normalizedError.cause.http_code,
+        },
+      }),
     },
   });
 
