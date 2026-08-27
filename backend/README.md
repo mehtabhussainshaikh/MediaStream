@@ -1,46 +1,173 @@
 # MediaStream Backend
 
-Phase 1 provides the Express application foundation, Mongoose-managed MongoDB lifecycle, common security and error middleware, health endpoint, Swagger foundation, and graceful shutdown.
+Versioned REST API for secure multimedia upload, Cloudinary-backed previews, MongoDB metadata, authentication, ownership controls, search, ranking, and pagination.
 
 ## Requirements
 
 - Node.js 24 or newer
-- MongoDB Atlas connection string
+- MongoDB Atlas database
+- Cloudinary account
 
 ## Local setup
 
-1. Copy `.env.example` to `.env` and replace every example value.
-2. Install dependencies with `npm install`.
-3. Start the API with `npm run dev`. The development and start scripts load `backend/.env` when it exists; production platforms may inject the same variables directly.
+```bash
+cd backend
+cp .env.example .env
+npm install
+npm run dev
+```
 
-The process validates required environment variables before connecting to MongoDB. It exits on invalid configuration or a failed database connection.
+Replace every example value in `.env`. Development and start scripts load `backend/.env` when it exists; production platforms can inject the same variables directly. The process fails fast when mandatory configuration or the MongoDB connection is unavailable.
 
-## Available endpoints
+After startup:
 
-- `GET /health` - liveness and MongoDB readiness.
-- `POST /api/v1/auth/register` - create an account.
-- `POST /api/v1/auth/login` - create an authenticated session.
-- `POST /api/v1/auth/refresh` - rotate the refresh session.
-- `POST /api/v1/auth/logout` - revoke the refresh session.
-- `GET /api/v1/auth/me` - return the authenticated user.
-- `POST /api/v1/media` - upload one authenticated image, video, audio, or PDF.
-- `GET /api/v1/media` - search, filter, rank, and paginate ready media.
-- `GET /api/v1/media/mine` - list the current user's uploads.
-- `GET /api/v1/media/:id` - return authenticated media details.
-- `PATCH /api/v1/media/:id` - update owner/admin-controlled title, description, or tags.
-- `DELETE /api/v1/media/:id` - delete an owner/admin-controlled provider asset and metadata.
-- `POST /api/v1/media/:id/view` - atomically increment the view count.
-- `GET /api-docs` - Swagger UI.
-- `GET /api-docs.json` - OpenAPI JSON.
+- Health: `http://localhost:3000/health`
+- Swagger UI: `http://localhost:3000/api-docs`
+- OpenAPI JSON: `http://localhost:3000/api-docs.json`
+
+## Environment variables
+
+| Variable | Required | Purpose |
+| --- | --- | --- |
+| `NODE_ENV` | No | `development`, `test`, or `production`; defaults to `development` |
+| `PORT` | No | HTTP port; defaults to `3000` |
+| `MONGODB_URI` | Yes | MongoDB Atlas connection string and database name |
+| `FRONTEND_ORIGIN` | Yes | One exact HTTP(S) origin allowed to send credentialed browser requests |
+| `JSON_BODY_LIMIT` | No | Express JSON payload limit; defaults to `100kb` |
+| `SHUTDOWN_TIMEOUT_MS` | No | Graceful-shutdown timeout; defaults to `10000` |
+| `JWT_ACCESS_SECRET` | Yes | At least 32 random characters for HS256 access tokens |
+| `COOKIE_SAME_SITE` | No | `lax` or `strict` locally; use `none` only with production secure cookies when frontend/backend are cross-site |
+| `CLOUDINARY_CLOUD_NAME` | Yes | Cloudinary cloud name |
+| `CLOUDINARY_API_KEY` | Yes | Cloudinary API key |
+| `CLOUDINARY_API_SECRET` | Yes | Cloudinary API secret; never expose this to the frontend |
+| `MAX_IMAGE_SIZE_MB` | No | Image limit; defaults to `10` |
+| `MAX_VIDEO_SIZE_MB` | No | Video limit; defaults to `100` |
+| `MAX_AUDIO_SIZE_MB` | No | Audio limit; defaults to `25` |
+| `MAX_PDF_SIZE_MB` | No | PDF limit; defaults to `20` |
+
+Do not commit `.env`. The frontend will use a separate environment file containing only browser-safe values such as the deployed API base URL.
+
+## API contract
+
+All feature endpoints use `/api/v1`; health and documentation endpoints remain unversioned.
+
+| Method | Endpoint | Authentication | Purpose |
+| --- | --- | --- | --- |
+| `GET` | `/health` | Public | Liveness and MongoDB readiness |
+| `POST` | `/api/v1/auth/register` | Public | Create account |
+| `POST` | `/api/v1/auth/login` | Public | Return access token and set refresh cookie |
+| `POST` | `/api/v1/auth/refresh` | Refresh cookie | Rotate refresh session |
+| `POST` | `/api/v1/auth/logout` | Refresh cookie | Revoke session and clear cookie |
+| `GET` | `/api/v1/auth/me` | Bearer JWT | Current user |
+| `POST` | `/api/v1/media` | Bearer JWT | Upload one media file |
+| `GET` | `/api/v1/media` | Bearer JWT | Search, filter, rank, and paginate |
+| `GET` | `/api/v1/media/mine` | Bearer JWT | Current owner's uploads |
+| `GET` | `/api/v1/media/:id` | Bearer JWT | Media details and preview metadata |
+| `PATCH` | `/api/v1/media/:id` | Owner/admin | Update title, description, or tags |
+| `DELETE` | `/api/v1/media/:id` | Owner/admin | Delete Cloudinary asset and metadata |
+| `POST` | `/api/v1/media/:id/view` | Bearer JWT | Atomically increment views |
+| `GET` | `/api-docs` | Public | Swagger UI |
+| `GET` | `/api-docs.json` | Public | OpenAPI JSON |
+
+Swagger is the canonical wire contract and includes request schemas, security schemes, examples, response envelopes, and stable error statuses.
+
+### Authentication
+
+- Registration accepts `name`, `email`, and `password`.
+- Login returns a 15-minute HS256 bearer JWT and sets `mediastream_refresh` as an HttpOnly seven-day cookie.
+- Refresh tokens are 32-byte random values; only SHA-256 hashes are persisted.
+- Refresh is one-time and rotating. Expired, revoked, or replayed sessions return `401`.
+- Login is rate-limited and uses the same client response for missing accounts and incorrect passwords.
+
+### Upload
+
+`POST /api/v1/media` accepts `multipart/form-data`:
+
+- `file`: exactly one supported file
+- `title`: 2-120 characters
+- `description`: optional, at most 2000 characters
+- `tags`: optional comma-separated list, at most 10 unique lowercase tags of 30 characters each
+
+Supported types are JPEG, PNG, WebP, GIF, MP4, WebM, QuickTime, MP3, WAV, OGG, M4A, and PDF. Multer keeps the file in memory and streams it to Cloudinary. If MongoDB persistence fails afterward, the service attempts compensating provider deletion.
+
+### Search and ranking
+
+`GET /api/v1/media` accepts `q`, `type`, `tags`, `from`, `to`, `sort`, `page`, and `limit`.
+
+- Text search uses the weighted index: title 10, original filename 8, tags 6, description 2.
+- Text results sort by score, views, creation time, then `_id`.
+- Non-text sort values are `newest`, `oldest`, and `mostViewed`.
+- Tags use an all-tags match.
+- Dates are inclusive UTC days in `YYYY-MM-DD` format.
+- Pagination defaults to 20 and is capped at 50.
+- Each authenticated view request increments once; deduplication is intentionally outside the baseline.
+
+## Response envelopes
+
+Success:
+
+```json
+{
+  "success": true,
+  "data": {},
+  "meta": {}
+}
+```
+
+Error:
+
+```json
+{
+  "success": false,
+  "error": {
+    "code": "VALIDATION_ERROR",
+    "message": "Request validation failed",
+    "details": []
+  },
+  "requestId": "uuid"
+}
+```
+
+`meta` and `details` are optional. Internal stacks, credentials, cookies, raw tokens, and provider errors are never returned.
 
 ## Verification
 
-- `npm test`
-- `npm run test:coverage`
-- `npm audit --audit-level=high`
+```bash
+npm test
+npm run test:coverage
+npm audit --audit-level=high
+```
 
-Authentication uses a 15-minute bearer JWT and a rotating seven-day HttpOnly refresh cookie. Remaining media CRUD and search endpoints will be added on their planned feature branches.
+The tests cover validators, Mongoose models/indexes, repositories, token/session logic, authorization, Cloudinary error mapping, HTTP integration behavior, failure compensation, search/ranking, and Swagger contract drift.
 
-Media uploads use Multer memory storage and stream directly to Cloudinary. Configure Cloudinary credentials and the per-type limits in `.env`; defaults are 10 MB for images, 100 MB for video, 25 MB for audio, and 20 MB for PDFs. The multipart fields are `file`, `title`, optional `description`, and optional comma-separated `tags`.
+Import `postman/MediaStream.postman_collection.json` into Postman and set its collection variables. Postman retains the refresh cookie automatically after login.
 
-Search accepts `q`, `type`, comma-separated `tags`, inclusive `from`/`to` dates, `sort`, `page`, and `limit`. Text searches use the weighted MongoDB text index and deterministic relevance tie-breakers. Pagination defaults to 20 and is capped at 50.
+For a running local or deployed API:
+
+```bash
+SMOKE_BASE_URL=http://localhost:3000 npm run smoke
+```
+
+The smoke check requires `/health` to report MongoDB ready and verifies the published OpenAPI document.
+
+## Railway deployment
+
+Railway is the selected deployment target from the assessment's permitted examples.
+
+1. Push the repository to GitHub and create a Railway service from it.
+2. Set the service root directory to `/backend`.
+3. Use `npm ci` as the build command and `npm start` as the start command.
+4. Add every required environment variable from the table. Set `NODE_ENV=production`, set `FRONTEND_ORIGIN` to the exact deployed frontend origin, and choose the explicit production `COOKIE_SAME_SITE` policy.
+5. Configure the health-check path as `/health`.
+6. Generate a public Railway domain.
+7. Run `SMOKE_BASE_URL=https://<railway-domain> npm run smoke` and verify Swagger at `/api-docs`.
+
+The application enables Express `trust proxy` in production, secure cookies, graceful `SIGTERM`/`SIGINT` shutdown, structured request logging, and secret redaction.
+
+## Current assumptions and incomplete items
+
+- Backend implementation and automated verification are complete through Phase 6 readiness.
+- The live Railway URL is pending Railway project creation/authentication; no deployment credentials are available in this workspace.
+- MongoDB Atlas and Cloudinary must permit traffic from the deployed environment.
+- Frontend implementation is intentionally deferred.
+- WebSockets, fuzzy Atlas Search, analytics, moderation, billing, collaborative editing, public sharing, transcoding outside Cloudinary, and view deduplication remain out of scope.
