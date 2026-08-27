@@ -1,4 +1,4 @@
-export function createMediaUploadService({ media, storage, logger }) {
+export function createMediaUploadService({ media, storage, logger, notifications }) {
   return Object.freeze({
     async upload({ ownerId, file, metadata }) {
       const type = metadata.fileType;
@@ -31,7 +31,9 @@ export function createMediaUploadService({ media, storage, logger }) {
       };
 
       try {
-        return await media.create(record);
+        const created = await media.create(record);
+        notifications?.mediaUploaded(created);
+        return created;
       } catch (error) {
         try {
           await storage.destroy({ publicId: provider.public_id, resourceType: provider.resource_type });

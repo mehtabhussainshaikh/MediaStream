@@ -11,6 +11,7 @@ The React frontend is implemented in [`frontend/`](frontend/) and consumes the v
 - Cloudinary streaming uploads with compensation on persistence failure
 - JWT access tokens and rotating hashed refresh sessions
 - Media CRUD, owner/admin authorization, search, filters, ranking, pagination, and atomic views
+- Authenticated Socket.IO upload notifications with safe event payloads
 - Swagger/OpenAPI, Postman collection, unit/integration/contract tests, and deployment smoke test
 
 See [`backend/README.md`](backend/README.md) for setup, API usage, environment variables, tests, and Railway deployment instructions. The implementation decisions and phased delivery record are in [`BACKEND_IMPLEMENTATION_PLAN.md`](BACKEND_IMPLEMENTATION_PLAN.md).
@@ -23,6 +24,7 @@ See [`backend/README.md`](backend/README.md) for setup, API usage, environment v
 - Validated drag/drop upload with local image, video, audio, and PDF previews
 - URL-backed 400 ms debounced search, filters, server ranking, and pagination
 - Media details, view tracking, owner/admin metadata editing and confirmed deletion
+- Accessible real-time upload notifications with automatic media-cache refresh
 - Classical responsive SCSS design, keyboard/focus behavior, feedback and fallback states
 - Vitest and Testing Library checks plus production build verification
 
@@ -39,4 +41,4 @@ MediaStream/
   README.md
 ```
 
-Optional WebSocket and fuzzy-search stretch work remains outside the baseline.
+The WebSocket upload-notification stretch goal is implemented. Fuzzy Atlas Search remains outside the baseline.

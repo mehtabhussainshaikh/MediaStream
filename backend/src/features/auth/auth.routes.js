@@ -20,7 +20,7 @@ export function buildAuthModule({ config }) {
     tokens,
     refreshSessionTtlDays: config.refreshSessionTtlDays,
   });
-  return { service, authenticate: createAuthenticate({ tokens, users }) };
+  return { service, tokens, authenticate: createAuthenticate({ tokens, users }) };
 }
 
 export function createAuthRouter({ service, authenticate, config }) {

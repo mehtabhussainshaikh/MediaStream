@@ -1,6 +1,6 @@
 # MediaStream Backend
 
-Versioned REST API for secure multimedia upload, Cloudinary-backed previews, MongoDB metadata, authentication, ownership controls, search, ranking, and pagination.
+Versioned REST API and authenticated Socket.IO channel for secure multimedia upload, Cloudinary-backed previews, MongoDB metadata, authentication, ownership controls, search, ranking, pagination, and real-time upload notifications.
 
 ## Requirements
 
@@ -68,6 +68,12 @@ All feature endpoints use `/api/v1`; health and documentation endpoints remain u
 | `POST` | `/api/v1/media/:id/view` | Bearer JWT | Atomically increment views |
 | `GET` | `/api-docs` | Public | Swagger UI |
 | `GET` | `/api-docs.json` | Public | OpenAPI JSON |
+
+### Real-time notifications
+
+Socket.IO clients connect to the backend origin and pass the current access token in `auth.token`. Missing, expired, or invalid tokens are rejected. After a media upload is stored successfully, authenticated clients receive `media:uploaded` with `_id`-independent safe metadata: `id`, `ownerId`, `title`, `mediaType`, and `createdAt`. Provider URLs, credentials, and tokens are never broadcast.
+
+The frontend uses this event to announce the upload and invalidate affected RTK Query lists. Render supports WebSocket connections on the same public web-service URL; no separate port is required.
 
 Swagger is the canonical wire contract and includes request schemas, security schemes, examples, response envelopes, and stable error statuses.
 
@@ -170,4 +176,4 @@ The application enables Express `trust proxy` in production, secure cookies, gra
 - The live Railway URL is pending Railway project creation/authentication; no deployment credentials are available in this workspace.
 - MongoDB Atlas and Cloudinary must permit traffic from the deployed environment.
 - Frontend implementation is intentionally deferred.
-- WebSockets, fuzzy Atlas Search, analytics, moderation, billing, collaborative editing, public sharing, transcoding outside Cloudinary, and view deduplication remain out of scope.
+- Fuzzy Atlas Search, analytics, moderation, billing, collaborative editing, public sharing, transcoding outside Cloudinary, and view deduplication remain out of scope.

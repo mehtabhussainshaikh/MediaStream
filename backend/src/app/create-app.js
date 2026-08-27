@@ -18,6 +18,7 @@ export function createApp({
   mediaUploadModule,
   mediaCrudModule,
   mediaSearchModule,
+  notifications,
 }) {
   const app = express();
   app.disable('x-powered-by');
@@ -36,7 +37,7 @@ export function createApp({
 
   const resolvedAuthModule = authModule || buildAuthModule({ config });
   app.use('/api/v1/auth', createAuthRouter({ ...resolvedAuthModule, config }));
-  const resolvedMediaUploadModule = mediaUploadModule || buildMediaUploadModule({ config, logger });
+  const resolvedMediaUploadModule = mediaUploadModule || buildMediaUploadModule({ config, logger, notifications });
   app.use('/api/v1/media', createMediaUploadRouter({
     ...resolvedMediaUploadModule,
     authenticate: resolvedAuthModule.authenticate,

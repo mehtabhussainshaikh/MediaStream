@@ -17,9 +17,11 @@ Open `http://localhost:5173`. Set the backend `FRONTEND_ORIGIN` to that exact or
 
 ## Environment
 
-`VITE_API_BASE_URL` is the backend origin without `/api/v1`. The optional media size variables mirror backend limits and are used only for early client feedback. Backend validation remains authoritative.
+`VITE_API_BASE_URL` is the backend origin without `/api/v1`. `VITE_REALTIME_URL` is the Socket.IO backend origin and normally uses the same value. The optional media size variables mirror backend limits and are used only for early client feedback. Backend validation remains authoritative.
 
 Access and refresh tokens are never written to local storage. The access token remains in Redux memory; the backend owns the HttpOnly refresh cookie. API requests send `credentials: include` and perform at most one refresh attempt after a `401`.
+
+Authenticated Socket.IO connections use the same in-memory access token. Successful uploads broadcast safe media metadata, display an accessible notification, and invalidate media-list caches without exposing provider URLs.
 
 ## Commands
 
