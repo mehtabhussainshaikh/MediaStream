@@ -7,8 +7,9 @@ import { requestContext } from '../middleware/request-context.js';
 import { openApiDocument } from '../infrastructure/swagger/openapi.js';
 import { buildAuthModule, createAuthRouter } from '../features/auth/auth.routes.js';
 import { buildMediaUploadModule, createMediaUploadRouter } from '../features/media/media-upload.routes.js';
+import { buildMediaCrudModule, createMediaCrudRouter } from '../features/media/media-crud.routes.js';
 
-export function createApp({ config, database, logger, authModule, mediaUploadModule }) {
+export function createApp({ config, database, logger, authModule, mediaUploadModule, mediaCrudModule }) {
   const app = express();
   app.disable('x-powered-by');
   if (config.isProduction) {
@@ -31,6 +32,11 @@ export function createApp({ config, database, logger, authModule, mediaUploadMod
     ...resolvedMediaUploadModule,
     authenticate: resolvedAuthModule.authenticate,
     config,
+  }));
+  const resolvedMediaCrudModule = mediaCrudModule || buildMediaCrudModule({ config });
+  app.use('/api/v1/media', createMediaCrudRouter({
+    ...resolvedMediaCrudModule,
+    authenticate: resolvedAuthModule.authenticate,
   }));
 
   app.get('/health', (request, response) => {
