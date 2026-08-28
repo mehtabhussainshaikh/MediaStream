@@ -33,9 +33,15 @@ describe('media CRUD service', () => {
 
   test('returns details and maps missing records to MEDIA_NOT_FOUND', async () => {
     const { service, media } = setup();
-    await expect(service.details(id)).resolves.toBe(record);
+    await expect(service.details(id, { id: ownerId, role: 'user' })).resolves.toBe(record);
     media.findById.mockResolvedValueOnce(null);
-    await expect(service.details(id)).rejects.toMatchObject({ status: 404, code: 'MEDIA_NOT_FOUND' });
+    await expect(service.details(id, { id: ownerId, role: 'user' })).rejects.toMatchObject({ status: 404, code: 'MEDIA_NOT_FOUND' });
+  });
+
+  test('rejects detail access from a different owner', async () => {
+    const { service } = setup();
+    await expect(service.details(id, { id: 'different-user', role: 'user' }))
+      .rejects.toMatchObject({ status: 403, code: 'FORBIDDEN' });
   });
 
   test('allows owner/admin updates and rejects forged ownership', async () => {

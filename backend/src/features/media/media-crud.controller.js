@@ -8,7 +8,7 @@ export function createMediaCrudController({ service }) {
       response.json({ success: true, data: { media: result.items }, meta: result.meta });
     },
     async details(request, response) {
-      const media = await service.details(validateMediaId(request.params.id));
+      const media = await service.details(validateMediaId(request.params.id), request.user);
       response.json({ success: true, data: { media } });
     },
     async update(request, response) {

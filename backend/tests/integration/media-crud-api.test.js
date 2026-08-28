@@ -71,7 +71,7 @@ describe('media CRUD API', () => {
       const response = await fetch(`${baseUrl}/api/v1/media/${mediaId}`, { headers: authorization });
       expect(response.status).toBe(200);
       expect((await response.json()).data.media).toEqual(record);
-      expect(service.details).toHaveBeenCalledWith(mediaId);
+      expect(service.details).toHaveBeenCalledWith(mediaId, { id: ownerId, role: 'user' });
     });
   });
 

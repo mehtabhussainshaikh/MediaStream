@@ -30,8 +30,10 @@ export function createMediaCrudService({ media, storage }) {
         },
       };
     },
-    async details(id) {
-      return requireMedia(id);
+    async details(id, user) {
+      const current = await requireMedia(id);
+      assertCanManageMedia(user, current);
+      return current;
     },
     async update(id, user, metadata) {
       const current = await requireMedia(id);

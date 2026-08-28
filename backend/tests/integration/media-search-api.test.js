@@ -58,7 +58,7 @@ describe('media search API', () => {
       expect((await response.json()).meta.total).toBe(1);
       expect(service.search).toHaveBeenCalledWith(expect.objectContaining({
         q: 'launch', type: 'video', tags: ['demo', 'featured'], sort: 'relevance', page: 1, limit: 20,
-      }));
+      }), { id: userId, role: 'user' });
     });
   });
 
@@ -80,7 +80,7 @@ describe('media search API', () => {
       });
       expect(response.status).toBe(200);
       expect((await response.json()).data.media.viewCount).toBe(4);
-      expect(service.incrementView).toHaveBeenCalledWith(mediaId);
+      expect(service.incrementView).toHaveBeenCalledWith(mediaId, { id: userId, role: 'user' });
     });
   });
 });
