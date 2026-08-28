@@ -34,6 +34,9 @@ describe('auth OpenAPI contract', () => {
   test('documents owner listing, details, metadata updates, and deletion', () => {
     const mine = openApiDocument.paths['/api/v1/media/mine'].get;
     expect(mine.security).toEqual([{ bearerAuth: [] }]);
+    expect(mine.parameters.map(({ name }) => name)).toEqual([
+      'q', 'type', 'tags', 'from', 'to', 'sort', 'page', 'limit',
+    ]);
     expect(Object.keys(mine.responses)).toEqual(expect.arrayContaining(['200', '400', '401']));
 
     const item = openApiDocument.paths['/api/v1/media/{id}'];

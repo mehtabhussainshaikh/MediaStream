@@ -1,9 +1,10 @@
-import { validateMediaId, validateMetadataPatch, validateOwnerPagination } from './media-crud.validator.js';
+import { validateMediaId, validateMetadataPatch } from './media-crud.validator.js';
+import { validateMediaSearch } from './media-search.validator.js';
 
 export function createMediaCrudController({ service }) {
   return Object.freeze({
     async mine(request, response) {
-      const result = await service.mine(request.user.id, validateOwnerPagination(request.query));
+      const result = await service.mine(request.user.id, validateMediaSearch(request.query));
       response.json({ success: true, data: { media: result.items }, meta: result.meta });
     },
     async details(request, response) {
