@@ -134,6 +134,12 @@ export const openApiDocument = Object.freeze({
       get: {
         tags: ['Media'], summary: "List the current user's uploads", security: [{ bearerAuth: [] }],
         parameters: [
+          { name: 'q', in: 'query', schema: { type: 'string', minLength: 1, maxLength: 200 } },
+          { name: 'type', in: 'query', schema: { type: 'string', enum: ['image', 'video', 'audio', 'pdf'] } },
+          { name: 'tags', in: 'query', schema: { type: 'string' }, description: 'Comma-separated tags; every supplied tag must match' },
+          { name: 'from', in: 'query', schema: { type: 'string', format: 'date' } },
+          { name: 'to', in: 'query', schema: { type: 'string', format: 'date' } },
+          { name: 'sort', in: 'query', schema: { type: 'string', enum: ['relevance', 'newest', 'oldest', 'mostViewed'] } },
           { name: 'page', in: 'query', schema: { type: 'integer', minimum: 1, default: 1 } },
           { name: 'limit', in: 'query', schema: { type: 'integer', minimum: 1, maximum: 50, default: 20 } },
         ],

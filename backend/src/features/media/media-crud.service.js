@@ -1,5 +1,6 @@
 import { AppError } from '../../shared/app-error.js';
 import { assertCanManageMedia } from './media.policy.js';
+import { buildMediaSearchQuery } from './media-search.query.js';
 
 function notFound() {
   return new AppError({ status: 404, code: 'MEDIA_NOT_FOUND', message: 'Media was not found' });
@@ -12,18 +13,20 @@ export function createMediaCrudService({ media, storage }) {
   }
 
   return Object.freeze({
-    async mine(ownerId, pagination) {
-      const { items, total } = await media.listByOwner(ownerId, pagination);
-      const totalPages = total === 0 ? 0 : Math.ceil(total / pagination.limit);
+    async mine(ownerId, criteria) {
+      const query = buildMediaSearchQuery(criteria);
+      query.filter.ownerId = ownerId;
+      const { items, total } = await media.search(query);
+      const totalPages = total === 0 ? 0 : Math.ceil(total / criteria.limit);
       return {
         items,
         meta: {
-          page: pagination.page,
-          limit: pagination.limit,
+          page: criteria.page,
+          limit: criteria.limit,
           total,
           totalPages,
-          hasNextPage: pagination.page < totalPages,
-          hasPreviousPage: pagination.page > 1,
+          hasNextPage: criteria.page < totalPages,
+          hasPreviousPage: criteria.page > 1,
         },
       };
     },

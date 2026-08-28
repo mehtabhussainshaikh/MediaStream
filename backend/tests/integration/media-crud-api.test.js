@@ -47,8 +47,21 @@ describe('media CRUD API', () => {
       const body = await response.json();
       expect(body.data.media).toEqual([record]);
       expect(body.meta.total).toBe(1);
-      expect(service.mine).toHaveBeenCalledWith(ownerId, { page: 1, limit: 20, skip: 0 });
+      expect(service.mine).toHaveBeenCalledWith(ownerId, expect.objectContaining({
+        q: undefined, type: undefined, tags: [], sort: 'newest', page: 1, limit: 20, skip: 0,
+      }));
       expect(service.details).not.toHaveBeenCalled();
+    });
+  });
+
+  test('accepts search and filters for the current owner', async () => {
+    const { app, service } = setup();
+    await withHttpServer(app, async (baseUrl) => {
+      const response = await fetch(`${baseUrl}/api/v1/media/mine?q=launch&type=image&tags=demo%2Cfeatured&sort=relevance`, { headers: authorization });
+      expect(response.status).toBe(200);
+      expect(service.mine).toHaveBeenCalledWith(ownerId, expect.objectContaining({
+        q: 'launch', type: 'image', tags: ['demo', 'featured'], sort: 'relevance',
+      }));
     });
   });
 
