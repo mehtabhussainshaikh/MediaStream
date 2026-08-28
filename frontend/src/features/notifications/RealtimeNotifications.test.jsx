@@ -17,7 +17,7 @@ it('announces upload events and closes the authenticated socket', () => {
   const view = render(<Provider store={store}><RealtimeNotifications /></Provider>);
   act(() => handlers['media:uploaded']({ id: 'media-1', ownerId: 'user-1', title: 'A new piece', mediaType: 'image' }));
   expect(screen.getByRole('status')).toHaveTextContent('Upload complete');
-  expect(screen.getByRole('status')).toHaveTextContent('A new piece is now available');
+  expect(screen.getByRole('status')).toHaveTextContent('A new piece is now available in your media');
   view.unmount();
   expect(close).toHaveBeenCalled();
 });

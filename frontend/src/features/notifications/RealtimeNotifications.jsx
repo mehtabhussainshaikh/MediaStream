@@ -28,5 +28,5 @@ export function RealtimeNotifications() {
   }, [notification]);
 
   if (!notification) return <div className="sr-only" aria-live="polite" aria-atomic="true" />;
-  return <aside className="realtime-toast" role="status" aria-live="polite" aria-atomic="true"><span className="realtime-toast__mark" aria-hidden="true">✦</span><div><strong>{notification.own ? 'Upload complete' : 'New media added'}</strong><p>{notification.title} is now available in the library.</p></div><button type="button" aria-label="Dismiss notification" onClick={() => setNotification(null)}>×</button></aside>;
+  return <aside className="realtime-toast" role="status" aria-live="polite" aria-atomic="true"><span className="realtime-toast__mark" aria-hidden="true">✦</span><div><strong>{notification.own ? 'Upload complete' : 'New media added'}</strong><p>{notification.title} is now available in your media.</p></div><button type="button" aria-label="Dismiss notification" onClick={() => setNotification(null)}>×</button></aside>;
 }

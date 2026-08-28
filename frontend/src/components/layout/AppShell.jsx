@@ -15,8 +15,8 @@ export function AppShell() {
 
 function HeaderSearch() {
   const location = useLocation(); const navigate = useNavigate(); const [params] = useSearchParams(); const [query, setQuery] = useState(params.get('q') || '');
-  const libraryRoute = location.pathname === '/media';
-  useEffect(() => setQuery(libraryRoute ? params.get('q') || '' : ''), [libraryRoute, params]);
-  const submit = (event) => { event.preventDefault(); const next = new URLSearchParams(libraryRoute ? params : undefined); const value = query.trim(); if (value) { next.set('q', value); next.set('sort', 'relevance'); } else { next.delete('q'); next.delete('sort'); } next.delete('page'); const target = libraryRoute ? location.pathname : '/media'; navigate(`${target}${next.size ? `?${next}` : ''}`); };
+  const mediaRoute = location.pathname === '/media';
+  useEffect(() => setQuery(mediaRoute ? params.get('q') || '' : ''), [mediaRoute, params]);
+  const submit = (event) => { event.preventDefault(); const next = new URLSearchParams(mediaRoute ? params : undefined); const value = query.trim(); if (value) { next.set('q', value); next.set('sort', 'relevance'); } else { next.delete('q'); next.delete('sort'); } next.delete('page'); const target = mediaRoute ? location.pathname : '/media'; navigate(`${target}${next.size ? `?${next}` : ''}`); };
   return <form className="header-search" role="search" onSubmit={submit}><span aria-hidden="true">⌕</span><label className="sr-only" htmlFor="header-search">Search media</label><input id="header-search" type="search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search media…" /><button type="submit">Search</button></form>;
 }

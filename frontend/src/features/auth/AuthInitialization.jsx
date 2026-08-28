@@ -13,6 +13,6 @@ export function AuthInitialization({ children }) {
     started.current = true; dispatch(sessionChecking());
     refresh().unwrap().catch(() => dispatch(sessionCleared()));
   }, [dispatch, refresh, status]);
-  if (status === 'idle' || status === 'checking') return <div className="auth-loading" role="status"><span className="brand__mark">M</span><span>Restoring your library…</span></div>;
+  if (status === 'idle' || status === 'checking') return <div className="auth-loading" role="status"><span className="brand__mark">M</span><span>Restoring your media…</span></div>;
   return children;
 }

@@ -40,7 +40,6 @@ npm run preview
 | `/register` | Public only | Create account |
 | `/login` | Public only | Sign in and restore intended destination |
 | `/media` | Authenticated | URL-backed search, filters, server ranking, pagination |
-| `/media/mine` | Authenticated | Current user's uploads |
 | `/media/upload` | Authenticated | Validated drag/drop upload and local preview |
 | `/media/:id` | Authenticated | Preview, view event, metadata, owner edit/delete |
 

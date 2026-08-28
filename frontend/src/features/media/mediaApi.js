@@ -3,7 +3,6 @@ import { api } from '../../services/api';
 const listTags = (result) => result?.data?.media?.length ? [...result.data.media.map(({ _id }) => ({ type: 'Media', id: _id })), { type: 'MediaList', id: 'LIST' }] : [{ type: 'MediaList', id: 'LIST' }];
 
 export const mediaApi = api.injectEndpoints({ endpoints: (builder) => ({
-  searchMedia: builder.query({ query: (params) => ({ url: '/media', params }), providesTags: listTags }),
   myMedia: builder.query({ query: (params) => ({ url: '/media/mine', params }), providesTags: (result) => [...listTags(result), 'MyMedia'] }),
   mediaById: builder.query({ query: (id) => `/media/${id}`, providesTags: (_result, _error, id) => [{ type: 'Media', id }] }),
   uploadMedia: builder.mutation({ query: (body) => ({ url: '/media', method: 'POST', body }), invalidatesTags: [{ type: 'MediaList', id: 'LIST' }, 'MyMedia'] }),
@@ -12,4 +11,4 @@ export const mediaApi = api.injectEndpoints({ endpoints: (builder) => ({
   deleteMedia: builder.mutation({ query: (id) => ({ url: `/media/${id}`, method: 'DELETE' }), invalidatesTags: (_result, _error, id) => [{ type: 'Media', id }, { type: 'MediaList', id: 'LIST' }, 'MyMedia'] }),
 }) });
 
-export const { useSearchMediaQuery, useMyMediaQuery, useMediaByIdQuery, useUploadMediaMutation, useRecordViewMutation, useUpdateMediaMutation, useDeleteMediaMutation } = mediaApi;
+export const { useMyMediaQuery, useMediaByIdQuery, useUploadMediaMutation, useRecordViewMutation, useUpdateMediaMutation, useDeleteMediaMutation } = mediaApi;
