@@ -6,11 +6,17 @@ export function normalizeTags(value) {
   const values = Array.isArray(value) ? value : [value];
   return [...new Set(values.flatMap((tag) => String(tag || '').split(',')).map((tag) => tag.trim().toLowerCase()).filter(Boolean))];
 }
+export function validateFile(file) {
+  if (!file) return 'Choose a file to upload.';
+  const mediaType = SUPPORTED_TYPES[file.type];
+  if (!mediaType) return 'Choose a JPEG, PNG, WebP, GIF, MP4, WebM, MOV, MP3, WAV, OGG, M4A, or PDF file.';
+  if (file.size > LIMITS_MB[mediaType] * 1024 * 1024) return `${mediaType[0].toUpperCase() + mediaType.slice(1)} files must be ${LIMITS_MB[mediaType]} MB or smaller. This file is ${(file.size / 1024 / 1024).toFixed(2)} MB.`;
+  return undefined;
+}
 export function validateUpload({ file, title, description, tags }) {
-  const errors = {}; const mediaType = file && SUPPORTED_TYPES[file.type]; const normalizedTags = normalizeTags(tags);
-  if (!file) errors.file = 'Choose a file to upload.';
-  else if (!mediaType) errors.file = 'Choose a JPEG, PNG, WebP, GIF, MP4, WebM, MOV, MP3, WAV, OGG, M4A, or PDF file.';
-  else if (file.size > LIMITS_MB[mediaType] * 1024 * 1024) errors.file = `${mediaType[0].toUpperCase() + mediaType.slice(1)} files must be ${LIMITS_MB[mediaType]} MB or smaller.`;
+  const errors = {}; const normalizedTags = normalizeTags(tags);
+  errors.file = validateFile(file);
+  if (!errors.file) delete errors.file;
   if (title.trim().length < 2 || title.trim().length > 120) errors.title = 'Title must be between 2 and 120 characters.';
   if (description.length > 2000) errors.description = 'Description cannot exceed 2,000 characters.';
   if (normalizedTags.length > 10) errors.tags = 'Use no more than 10 unique tags.';
