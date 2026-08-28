@@ -4,7 +4,9 @@ import { MediaRenderer } from './MediaRenderer';
 
 it('renders an accessible image and fallback after failure', () => { render(<MediaRenderer mediaType="image" src="bad.jpg" title="Portrait" />); const image = screen.getByRole('img', { name: 'Portrait' }); fireEvent.error(image); expect(screen.getByRole('img', { name: 'Portrait preview unavailable' })).toBeInTheDocument(); expect(screen.getByRole('link', { name: 'Open original' })).toHaveAttribute('href', 'bad.jpg'); });
 
-it('renders PDFs in an embedded viewer', () => { render(<MediaRenderer mediaType="pdf" src="document.pdf" title="Document" />); expect(screen.getByTitle('Document PDF preview')).toHaveAttribute('src', expect.stringContaining('document.pdf#page=1')); });
+it('renders local PDFs in an embedded viewer', () => { render(<MediaRenderer mediaType="pdf" src="blob:document" title="Document" />); expect(screen.getByTitle('Document PDF preview')).toHaveAttribute('src', expect.stringContaining('blob:document#page=1')); });
+
+it('renders a deliverable first-page preview for Cloudinary PDFs', () => { render(<MediaRenderer mediaType="pdf" src="https://res.cloudinary.com/demo/image/upload/v1/document.pdf" title="Document" />); const preview = screen.getByRole('img', { name: 'First page of Document' }); expect(preview).toHaveAttribute('src', expect.stringContaining('/upload/pg_1,w_1400,c_limit,q_auto,f_jpg/')); expect(preview).toHaveAttribute('src', expect.stringMatching(/document\.jpg$/)); });
 
 it('renders video with playback controls on the detail view', () => { const { container } = render(<MediaRenderer mediaType="video" src="clip.mp4" title="Clip" />); const video = container.querySelector('video'); expect(video).toHaveAttribute('src', 'clip.mp4'); expect(video).toHaveAttribute('controls'); });
 
