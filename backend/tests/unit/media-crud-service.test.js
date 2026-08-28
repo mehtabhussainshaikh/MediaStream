@@ -10,7 +10,7 @@ const record = {
 function setup() {
   const media = {
     findById: jest.fn(async () => record),
-    listByOwner: jest.fn(async () => ({ items: [record], total: 21 })),
+    search: jest.fn(async () => ({ items: [record], total: 21 })),
     updateMetadata: jest.fn(async (_id, metadata) => ({ ...record, ...metadata })),
     deleteById: jest.fn(async () => record),
   };
@@ -21,12 +21,14 @@ function setup() {
 describe('media CRUD service', () => {
   test('lists only the current owner with pagination metadata', async () => {
     const { service, media } = setup();
-    const pagination = { page: 2, limit: 20, skip: 20 };
-    await expect(service.mine(ownerId, pagination)).resolves.toEqual({
+    const criteria = { q: undefined, type: 'video', tags: ['demo'], from: undefined, to: undefined, sort: 'newest', page: 2, limit: 20, skip: 20 };
+    await expect(service.mine(ownerId, criteria)).resolves.toEqual({
       items: [record],
       meta: { page: 2, limit: 20, total: 21, totalPages: 2, hasNextPage: false, hasPreviousPage: true },
     });
-    expect(media.listByOwner).toHaveBeenCalledWith(ownerId, pagination);
+    expect(media.search).toHaveBeenCalledWith(expect.objectContaining({
+      filter: expect.objectContaining({ ownerId, mediaType: 'video', tags: { $all: ['demo'] } }),
+    }));
   });
 
   test('returns details and maps missing records to MEDIA_NOT_FOUND', async () => {

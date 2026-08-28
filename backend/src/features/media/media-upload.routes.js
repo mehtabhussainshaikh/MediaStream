@@ -7,12 +7,13 @@ import { createMediaRepository } from './media.repository.js';
 import { createMediaUploadController } from './media-upload.controller.js';
 import { createMediaUploadService } from './media-upload.service.js';
 
-export function buildMediaUploadModule({ config, logger }) {
+export function buildMediaUploadModule({ config, logger, notifications }) {
   return {
     service: createMediaUploadService({
       media: createMediaRepository(),
       storage: createCloudinaryAdapter(config.cloudinary),
       logger,
+      notifications,
     }),
   };
 }
