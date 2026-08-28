@@ -2,7 +2,10 @@ export const SUPPORTED_TYPES = { 'image/jpeg': 'image', 'image/png': 'image', 'i
 const env = import.meta.env;
 export const LIMITS_MB = { image: Number(env.VITE_MAX_IMAGE_SIZE_MB || 10), video: Number(env.VITE_MAX_VIDEO_SIZE_MB || 100), audio: Number(env.VITE_MAX_AUDIO_SIZE_MB || 25), pdf: Number(env.VITE_MAX_PDF_SIZE_MB || 20) };
 
-export function normalizeTags(value) { return [...new Set(value.split(',').map((tag) => tag.trim().toLowerCase()).filter(Boolean))]; }
+export function normalizeTags(value) {
+  const values = Array.isArray(value) ? value : [value];
+  return [...new Set(values.flatMap((tag) => String(tag || '').split(',')).map((tag) => tag.trim().toLowerCase()).filter(Boolean))];
+}
 export function validateUpload({ file, title, description, tags }) {
   const errors = {}; const mediaType = file && SUPPORTED_TYPES[file.type]; const normalizedTags = normalizeTags(tags);
   if (!file) errors.file = 'Choose a file to upload.';

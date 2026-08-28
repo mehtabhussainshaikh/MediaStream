@@ -9,6 +9,11 @@ describe('media upload validation', () => {
     })).toEqual({ title: 'Launch Image', description: 'Preview', tags: ['demo', 'media'] });
   });
 
+  test('normalizes repeated and comma-separated tag fields together', () => {
+    expect(validateUploadMetadata({ title: 'Launch Image', tags: [' Demo,MEDIA ', 'featured', 'demo'] }))
+      .toEqual({ title: 'Launch Image', description: '', tags: ['demo', 'media', 'featured'] });
+  });
+
   test('rejects invalid metadata and missing files', () => {
     expect(() => validateUploadMetadata({ title: 'x', tags: Array.from({ length: 11 }, (_, i) => `tag${i}`) }))
       .toThrow(expect.objectContaining({ status: 400, code: 'VALIDATION_ERROR' }));

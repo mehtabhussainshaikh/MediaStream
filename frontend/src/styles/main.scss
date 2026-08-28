@@ -69,6 +69,12 @@ main { min-height: calc(100vh - 150px); }
 .media-fallback > span { font-size: 3rem; color: tokens.$burgundy; }
 .upload-form { box-shadow: none; }
 .upload-form label span { color: tokens.$muted; font-weight: 400; text-transform: none; letter-spacing: 0; }
+.tag-input { display: flex; flex-wrap: wrap; align-items: center; gap: .4rem; min-height: 48px; border: 1px solid tokens.$line; background: #fff; padding: .4rem; }
+.tag-input[aria-invalid='true'] { border-color: tokens.$burgundy; }
+.tag-input input { flex: 1 1 150px; min-height: 32px; border: 0; padding: .25rem; }
+.tag-input input:focus { outline: 0; }
+.tag-input__item { display: inline-flex; align-items: center; gap: .25rem; background: #e9e2d6; padding: .25rem .4rem; color: tokens.$ink !important; font-size: .78rem; text-transform: none; letter-spacing: 0; }
+.tag-input__item button { border: 0; background: transparent; color: tokens.$burgundy; cursor: pointer; padding: 0 .1rem; font-size: 1rem; line-height: 1; }
 .search-panel { margin-bottom: 2rem; border-bottom: 1px solid tokens.$line; padding-bottom: 1.5rem; }
 .search-field label { display: block; margin-bottom: .4rem; color: tokens.$muted; font-size: .75rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
 .search-field input { width: 100%; border: 0; border-bottom: 1px solid tokens.$ink; background: transparent; padding: .35rem 0; color: tokens.$ink; font-family: tokens.$serif; font-size: clamp(1.6rem, 4vw, 2.5rem); }

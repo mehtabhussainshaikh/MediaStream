@@ -8,8 +8,9 @@ function validationError(details) {
 export function validateUploadMetadata(body = {}) {
   const title = typeof body.title === 'string' ? body.title.trim() : '';
   const description = typeof body.description === 'string' ? body.description.trim() : '';
-  const rawTags = Array.isArray(body.tags) ? body.tags : String(body.tags || '').split(',');
-  const tags = [...new Set(rawTags.map((tag) => String(tag).trim().toLowerCase()).filter(Boolean))];
+  const rawTags = (Array.isArray(body.tags) ? body.tags : [body.tags])
+    .flatMap((value) => String(value || '').split(','));
+  const tags = [...new Set(rawTags.map((tag) => tag.trim().toLowerCase()).filter(Boolean))];
   const details = [];
   const unexpectedFields = Object.keys(body).filter((field) => !['title', 'description', 'tags'].includes(field));
   if (unexpectedFields.length) details.push({ field: 'body', message: `Unexpected fields: ${unexpectedFields.join(', ')}` });
