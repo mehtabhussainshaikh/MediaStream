@@ -1,6 +1,8 @@
 # MediaStream Frontend
 
-React interface for secure multimedia upload, server-ranked search, preview, metadata editing, and deletion.
+React interface for private multimedia upload, server-ranked search and filtering, previews, downloads, metadata editing, and deletion.
+
+**Live application:** [https://media-stream-delta.vercel.app](https://media-stream-delta.vercel.app)
 
 ## Local setup
 
@@ -45,6 +47,6 @@ npm run preview
 
 ## Deployment
 
-The included `vercel.json` configures Vite output and SPA route fallback. Import the repository in Vercel, set the root directory to `frontend`, and define both `VITE_API_BASE_URL` and `VITE_REALTIME_URL` as the public Render backend origin. The backend must set `FRONTEND_ORIGIN` to the exact Vercel production origin and use a compatible secure `SameSite` cookie policy.
+The included `vercel.json` configures Vite output and SPA route fallback. The production project uses `frontend` as its root directory and defines `VITE_API_BASE_URL` and `VITE_REALTIME_URL` with the public Render backend origin. The backend allows the exact Vercel production origin and uses secure cross-site refresh cookies.
 
-No live URL is included because hosting credentials and live MongoDB/Cloudinary configuration are not present in this workspace.
+Pushes to `main` automatically deploy to [https://media-stream-delta.vercel.app](https://media-stream-delta.vercel.app).

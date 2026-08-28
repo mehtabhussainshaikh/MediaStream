@@ -2,6 +2,9 @@
 
 Versioned REST API and authenticated Socket.IO channel for secure multimedia upload, Cloudinary-backed previews, MongoDB metadata, authentication, ownership controls, search, ranking, pagination, and real-time upload notifications.
 
+- **Live API:** [https://mediastream-backend-x9c8.onrender.com](https://mediastream-backend-x9c8.onrender.com)
+- **Swagger UI:** [https://mediastream-backend-x9c8.onrender.com/api-docs](https://mediastream-backend-x9c8.onrender.com/api-docs)
+
 ## Requirements
 
 - Node.js 24 or newer
@@ -156,24 +159,21 @@ SMOKE_BASE_URL=http://localhost:3000 npm run smoke
 
 The smoke check requires `/health` to report MongoDB ready and verifies the published OpenAPI document.
 
-## Railway deployment
+## Render deployment
 
-Railway is the selected deployment target from the assessment's permitted examples.
+The production API is deployed as a Render web service.
 
-1. Push the repository to GitHub and create a Railway service from it.
-2. Set the service root directory to `/backend`.
+1. Connect the GitHub repository to a Render web service.
+2. Set the service root directory to `backend`.
 3. Use `npm ci` as the build command and `npm start` as the start command.
 4. Add every required environment variable from the table. Set `NODE_ENV=production`, set `FRONTEND_ORIGIN` to the exact deployed frontend origin, and choose the explicit production `COOKIE_SAME_SITE` policy.
 5. Configure the health-check path as `/health`.
-6. Generate a public Railway domain.
-7. Run `SMOKE_BASE_URL=https://<railway-domain> npm run smoke` and verify Swagger at `/api-docs`.
+6. Configure the public Render domain.
+7. Run `SMOKE_BASE_URL=https://<render-domain> npm run smoke` and verify Swagger at `/api-docs`.
 
 The application enables Express `trust proxy` in production, secure cookies, graceful `SIGTERM`/`SIGINT` shutdown, structured request logging, and secret redaction.
 
-## Current assumptions and incomplete items
+## Scope notes
 
-- Backend implementation and automated verification are complete through Phase 6 readiness.
-- The live Railway URL is pending Railway project creation/authentication; no deployment credentials are available in this workspace.
 - MongoDB Atlas and Cloudinary must permit traffic from the deployed environment.
-- Frontend implementation is intentionally deferred.
 - Fuzzy Atlas Search, analytics, moderation, billing, collaborative editing, public sharing, transcoding outside Cloudinary, and view deduplication remain out of scope.
